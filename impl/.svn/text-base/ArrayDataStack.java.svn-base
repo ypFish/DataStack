@@ -1,0 +1,190 @@
+package com.sdt.junc.util.impl;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import com.sdt.junc.util.DataStack;
+
+public class ArrayDataStack implements DataStack {
+
+	//核心存储容器
+	protected List<byte[]> dataStack=null;
+	//内部游标
+	protected int course;
+	
+	public ArrayDataStack(){
+        this.dataStack=new LinkedList<byte[]>();
+    }
+	
+	@Override
+	public void add(byte[] bytes) {
+		// TODO Auto-generated method stub
+		this.dataStack.add(bytes);
+	}
+
+	@Override
+	public void add(byte[] bytes, int offset) {
+		// TODO Auto-generated method stub
+		int tempDataLen=bytes.length-offset;
+        byte[] tempData = new byte[tempDataLen];
+        System.arraycopy(bytes,0,tempData,0,tempDataLen);
+        this.dataStack.add(tempData);
+	}
+
+	@Override
+	public void add(byte[] bytes, int offset, int dataLen) {
+		// TODO Auto-generated method stub
+        byte[] tempData = new byte[dataLen];
+        System.arraycopy(bytes,0,tempData,0,dataLen);
+        this.dataStack.add(tempData);  		
+	}
+
+	@Override
+	public void add(byte b) {
+		// TODO Auto-generated method stub
+		byte[] bytes = new byte[]{b};
+		this.add(bytes);
+	}
+
+	@Override
+	public void add(DataStack dataStack) {
+		// TODO Auto-generated method stub
+		this.add(dataStack.getData());
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		this.dataStack.clear();
+	}
+
+	@Override
+	public void delete(int dataLen) {
+		// TODO Auto-generated method stub
+		if(dataLen>=this.getData().length){
+			this.clear();
+		}else{
+			byte[] dataBytes = this.getData();
+			byte[] tempBytes = new byte[dataBytes.length-dataLen];
+			System.arraycopy(dataBytes, 0, tempBytes, 0, tempBytes.length);
+			this.dataStack.clear();
+			this.add(tempBytes);
+		}
+	}
+
+	@Override
+	public byte[] getData() {
+		// TODO Auto-generated method stub
+		int byteLen = this.getDataLength();
+        byte[] datas = new byte[byteLen];
+        int byteLenOffset = 0;
+        for(byte[] bytes:this.dataStack){
+            System.arraycopy(bytes, 0, datas, byteLenOffset, bytes.length);
+            byteLenOffset+=bytes.length;
+        }
+        return datas;
+	}
+
+	@Override
+	public int getDataLength() {
+		// TODO Auto-generated method stub
+        int byteLen = 0;
+        for(byte[] bytes:this.dataStack){
+            byteLen+=bytes.length;
+        }
+        return byteLen;
+	}
+
+	@Override
+	public DataStack getDataStack() {
+		// TODO Auto-generated method stub
+		return this;
+	}
+
+	@Override
+	public void insert(int allDataOffset, byte[] bytes) {
+		// TODO Auto-generated method stub
+		if(allDataOffset>=this.getDataLength()){
+			this.add(bytes);
+		} else {
+			byte[] tempData = this.getData();
+			byte[] firstBytes = new byte[allDataOffset];
+			System.arraycopy(tempData, 0, firstBytes, 0, firstBytes.length);
+			byte[] secondBytes = new byte[tempData.length-allDataOffset];
+			System.arraycopy(tempData, firstBytes.length, secondBytes, 0, secondBytes.length);
+			this.dataStack.clear();
+			dataStack.add(firstBytes);
+			dataStack.add(bytes);
+			dataStack.add(secondBytes);
+		}
+	}
+
+	@Override
+	public void insert(int allDataOffset, byte[] bytes, int offset) {
+		// TODO Auto-generated method stub
+		int tempDataLen=bytes.length-offset;
+        byte[] tempData = new byte[tempDataLen];
+        System.arraycopy(bytes,offset,tempData,0,tempDataLen);
+        this.insert(allDataOffset,tempData);
+	}
+
+	@Override
+	public void insert(int allDataOffset, byte[] bytes, int offset, int dataLen) {
+		// TODO Auto-generated method stub
+        byte[] tempData = new byte[dataLen];
+        System.arraycopy(bytes,offset,tempData,0,dataLen);
+        this.insert(allDataOffset,tempData);
+	}
+
+	@Override
+	public void insert(int allDataOffset, byte b) {
+		// TODO Auto-generated method stub
+		byte[] bytes = new byte[]{b};
+		this.insert(allDataOffset,bytes);
+	}
+
+	@Override
+	public void insert(int allDataOffset, DataStack dataStack) {
+		// TODO Auto-generated method stub
+		this.insert(allDataOffset,dataStack.getData());
+	}
+
+	@Override
+	public int getCourse() {
+		// TODO Auto-generated method stub
+		return course;
+	}
+
+	@Override
+	public byte[] getData(int dataLen) {
+		// TODO Auto-generated method stub
+		return Arrays.copyOf(this.getData(), dataLen);
+	}
+
+	@Override
+	public byte[] getData(int offset, int dataLen) {
+		// TODO Auto-generated method stub
+		return Arrays.copyOfRange(this.getData(), offset, offset+dataLen);
+	}
+
+	@Override
+	public void initCourse() {
+		// TODO Auto-generated method stub
+		this.course = 0;
+	}
+
+	@Override
+	public byte[] pop(int dataLen) {
+		// TODO Auto-generated method stub
+		byte[] bytes = Arrays.copyOfRange(this.getData(), this.course, this.course+dataLen);
+		this.course += dataLen;
+		return bytes;
+	}
+
+	@Override
+	public void setCourse(int course) {
+		// TODO Auto-generated method stub
+		this.course=course;
+	}
+}
